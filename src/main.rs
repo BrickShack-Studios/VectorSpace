@@ -1,25 +1,21 @@
 extern crate sdl2; 
 
-use sdl2::pixels::Color;
+#[path = "./functions.rs"] mod f;
+#[path = "./entity.rs"] mod e;
+#[path = "./player.rs"] mod p;
+#[path = "./meteor.rs"] mod m;
+
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::render::{WindowCanvas, Texture};
-use sdl2::rect::{Point, Rect};
-// "self" imports the "image" module itself as well as everything else we listed
 use sdl2::image::{self, LoadTexture, InitFlag};
 use std::time::Duration;
+use sdl2::rect::{Rect};
+use sdl2::video::{Window, WindowContext};
+use sdl2::render::{Texture, TextureCreator, Canvas};
+use sdl2::pixels::{PixelFormatEnum};
 
-pub struct Controller {
-    up: bool,
-    down: bool,
-    left: bool,
-    right: bool,
-    shift: bool,
-    space: bool
-}
- 
 pub fn main() -> Result<(), String> {
-    let mut controller = Controller {
+    let mut controller = p::Controller {
         up: false,
         down: false,
         left: false,
@@ -43,10 +39,11 @@ pub fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
 
-    let texture = texture_creator.load_texture("./images/playerShip2_orange.png")?;
+    let player_texture = texture_creator.load_texture("../images/playerShip2_orange.png")?;
+    let meteor_texture = texture_creator.load_texture("../images/meteorBrown_big4.png")?;
 
-    let mut x = 0;
-    let mut y = 0;
+    let mut ship = p::Player::new(0f32, 0f32, 35u32, 30u32, 5f32, f::get_texture(&texture_creator, String::from("../images/playerShip2_orange.png")).unwrap());
+    let mut meteor = m::Meteor::new(400f32, 300f32, 64u32, 64u32, 3f32, meteor_texture);
 
     'running: loop {
         canvas.clear();
@@ -93,23 +90,13 @@ pub fn main() -> Result<(), String> {
         }
         // The rest of the game loop goes here...
 
-        if (controller.up) {
-            y -= 1;
-        }
-        else if (controller.down) {
-            y += 1;
-        }
+        ship.r#move(&controller);
+        ship.entity.draw(&mut canvas);
 
-        if (controller.left) {
-            x -= 1;
-        }
-        else if (controller.right) {
-            x += 1;
-        }
-
-        canvas.copy(&texture, None, Rect::new(x, y, 35, 30))?;
+        meteor.entity.draw(&mut canvas);
 
         canvas.present();
+
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
     Ok(())
