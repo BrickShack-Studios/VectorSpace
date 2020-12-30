@@ -9,12 +9,7 @@ edition = "2018"
 [dependencies.sdl2]
 version = "0.34.3"
 default-features = false
-features = ["image","mixer","static-link","use-vcpkg"]
+features = ["ttf","image","mixer"]
 
-[package.metadata.vcpkg]
-dependencies = ["sdl2","sdl2-image[png,jpg]","sdl2-mixer"]
-git = "https://github.com/microsoft/vcpkg"
-rev = "a0518036077baa4"
-
-[package.metadata.vcpkg.target]
-x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md" }
+[dependencies]
+rand = "0.8"

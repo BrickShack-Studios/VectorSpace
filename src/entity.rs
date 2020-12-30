@@ -17,12 +17,11 @@ pub struct Entity<'a> {
 }
 
 impl <'a>Entity<'a> {
-    pub fn new(x:f32, y:f32, w:u32, h:u32, speed:f32, texture: Texture<'a>) -> Entity<'a> {
+    pub fn new(x:f32, y:f32, w:u32, h:u32, speed:f32, velocity:Vec<f32>, texture: Texture<'a>) -> Entity<'a> {
         Entity {
             src: None,
             dst: Some(Rect::new(x as i32, y as i32, w, h)),
-            velocity: vec![0f32, 0f32],
-            x, y, w, h, speed, texture
+            x, y, w, h, speed, texture, velocity
         }
     }
     pub fn draw(&self, canvas: &mut Canvas<Window>) -> Result<(), String> {
@@ -33,6 +32,28 @@ impl <'a>Entity<'a> {
         if let Some(ref mut dst) = self.dst {
             dst.x = self.x as i32;
             dst.y = self.y as i32;
+        }
+    }
+    pub fn set_src(&mut self, x: i32, y: i32, w: i32, h: i32) {
+        if let Some(ref mut src) = self.src {
+            src.x = x;
+            src.y = y;
+            src.w = w;
+            src.h = h;
+        }
+        else {
+            self.src = Some(Rect::new(x, y, w as u32, h as u32));
+        }
+    }
+    pub fn on_screen(&self) -> bool {
+        if (self.x as i32) > 1200 || (self.x as i32) + (self.w as i32) < 0 {
+            return false;
+        }
+        else if (self.y as i32) + (self.h as i32) > 1200 || (self.y as i32) < 0 {
+            return false;
+        }
+        else {
+            return true;
         }
     }
 }
